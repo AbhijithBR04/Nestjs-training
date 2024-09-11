@@ -24,3 +24,15 @@ model User {
 
   password String
 }
+
+model Book {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  description String?
+  link        String
+  userId      Int
+
+  @@index([userId])
+}

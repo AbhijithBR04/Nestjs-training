@@ -3,13 +3,19 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class AuthService {
+  private readonly publicKey: string;
+
   constructor(
     private jwtService: JwtService,
     private prisma: PrismaService,
-  ) {}
+  ) {
+    this.publicKey = fs.readFileSync(path.join('./public.key'), 'utf8');
+  }
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.prisma.user.findUnique({ where: { email } });
@@ -30,9 +36,8 @@ export class AuthService {
     }
     throw new UnauthorizedException('Invalid credentials');
   }
-  
 
-  async register(email: string, pass: string,firstName: string, lastName: string, ) {
+  async register(email: string, pass: string, firstName: string, lastName: string) {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(pass, salt);
 
@@ -47,5 +52,17 @@ export class AuthService {
 
     const { password, ...result } = user;
     return result;
+  }
+
+  async verifyToken(token: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        publicKey: this.publicKey,
+        algorithms: ['RS256'],
+      });
+      return payload;
+    } catch (e) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

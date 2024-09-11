@@ -5,7 +5,7 @@ export class LoginUsermployeeDto {
   
   @ApiProperty({
     description: 'The email of the employee',
-    example: 'john.doe@example.com',
+    example: 'abhijith@email.com',
   })
   @IsEmail({}, { message: 'Invalid email address' })
   @IsNotEmpty({ message: 'Email is required' })
@@ -13,11 +13,10 @@ export class LoginUsermployeeDto {
 
   @ApiProperty({
     description: 'The password of the employee',
-    example: 'Password123!',
+    example: '1234',
   })
   @IsString({ message: 'Password must be a string' })
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
-
 
 }
