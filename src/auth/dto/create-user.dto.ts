@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEmployeeDto {
@@ -35,4 +35,11 @@ export class CreateEmployeeDto {
   @IsNotEmpty({ message: 'Last name is required' })
   lastName: string;
 
+  @ApiProperty({
+    description: 'The role of the employee (admin or user)',
+    example: 'admin',
+  })
+  @IsString()
+  @IsEnum([ 'admin', 'user' ])
+  role: 'admin' | 'user'; 
 }

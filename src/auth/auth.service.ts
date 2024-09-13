@@ -29,7 +29,7 @@ export class AuthService {
   async login(email: string, pass: string) {
     const user = await this.validateUser(email, pass);
     if (user) {
-      const payload = { email: user.email, sub: user.id };
+      const payload = { email: user.email, sub: user.id, role: user.role};
       return {
         access_token: this.jwtService.sign(payload),
       };
@@ -37,7 +37,7 @@ export class AuthService {
     throw new UnauthorizedException('Invalid credentials');
   }
 
-  async register(email: string, pass: string, firstName: string, lastName: string) {
+  async register(email: string, pass: string, firstName: string, lastName: string, role: 'admin' | 'user') {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(pass, salt);
 
@@ -47,13 +47,13 @@ export class AuthService {
         firstName,
         lastName,
         password: hashedPassword,
+        role,
       },
     });
 
     const { password, ...result } = user;
     return result;
   }
-
   async verifyToken(token: string) {
     try {
       const payload = await this.jwtService.verifyAsync(token, {

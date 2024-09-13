@@ -11,7 +11,7 @@ export class BooksService {
   }
 
 
-  async findAll(userId: number): Promise<Book[]> {
+  async findAll(userId?: number): Promise<Book[]> {
     return this.prisma.book.findMany({ where: { userId } });
   }
 

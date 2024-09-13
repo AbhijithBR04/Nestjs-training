@@ -13,6 +13,8 @@ import { BooksService } from './books.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateBookDto } from './dto/create-book.dto';
+import { Roles } from '../auth/roles.decorator'; // Adjust path as needed
+import { RolesGuard } from '../auth/roles.guard'; // Adjust path as needed
 
 @Controller('books')
 @ApiTags('Books')
@@ -31,17 +33,24 @@ export class BooksController {
   }
 
   @Get()
+  @Roles('admin') // Only admin can access this endpoint
+  @UseGuards(RolesGuard)
   findAll(@Request() req) {
-    return this.booksService.findAll(req.user.userId);
+    if (req.user.role === 'admin') {
+      return this.booksService.findAll();
+    }
+    return this.booksService.findAll(req.user.userId); 
   }
 
   @Get(':id')
+  @Roles('admin')
+  @UseGuards(RolesGuard)
   findOne(@Param('id') id: string, @Request() req) {
     return this.booksService.findOne(+id, req.user.userId);
   }
 
   @Patch(':id')
-  @ApiBody({type: CreateBookDto})
+  @ApiBody({ type: CreateBookDto })
   update(@Param('id') id: string, @Body() updateBookDto, @Request() req) {
     return this.booksService.update(+id, updateBookDto, req.user.userId);
   }
